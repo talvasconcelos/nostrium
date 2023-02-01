@@ -1,6 +1,7 @@
 <script>
-  import { marked } from "marked";
   import { state } from "../store";
+  import AuthorDetailed from "./components/AuthorDetailed.svelte";
+  import Markdown from "./components/Markdown.svelte";
 
   export let params;
 
@@ -24,10 +25,16 @@
       </section>
     {/if}
   </header>
-  <div>{@html marked(post.content)}</div>
-  <footer>
-    <a href={`lightning:${author.lud06}`}>Tip author</a>
-  </footer>
+  <Markdown>{post.content}</Markdown>
+  <!-- <div>{@html marked(post.content)}</div> -->
+  <section>
+    <footer>
+      <AuthorDetailed
+        profile={author}
+        pubkey={post.author}
+      />
+    </footer>
+  </section>
 </div>
 
 <style>

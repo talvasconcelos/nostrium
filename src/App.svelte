@@ -23,7 +23,7 @@
   }
 
   onMount(async () => {
-    return;
+    // return; //Test
     for (const url of config.relays) {
       const relay = relayInit(url);
       try {
@@ -111,6 +111,12 @@
 <footer>
   <hr />
   <div class="container-fluid">
-    <p>Nostrium</p>
+    <p>
+      <a
+        href="https://github.com/talvasconcelos/nostrium"
+        target="_blank"
+        rel="noopener noreferrer">GitHub</a
+      >
+    </p>
   </div>
 </footer>
