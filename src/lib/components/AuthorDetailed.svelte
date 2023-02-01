@@ -3,7 +3,7 @@
   export let profile, pubkey;
 
   $: name = profile && profile.name;
-  $: picture = profile ? profile.picture : null;
+  $: picture = profile ? profile.picture : "/img/avatar-default.png";
   //   $: date = new Intl.DateTimeFormat("en-US").format(post.timestamp * 1000);
 </script>
 

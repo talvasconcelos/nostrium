@@ -12,7 +12,7 @@
 
   const getPicture = (pubkey) => {
     if (!$state.profiles.has(pubkey) || !$state.profiles.get(pubkey)?.picture)
-      return "vite.svg";
+      return "/img/avatar-default.png";
     return $state.profiles.get(pubkey).picture;
   };
 
