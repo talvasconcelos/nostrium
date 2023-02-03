@@ -93,6 +93,18 @@
   });
 </script>
 
+<svelte:head>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>{config.siteTitle}</title>
+  <meta
+    name="Description"
+    content={config.siteTagline}
+  />
+</svelte:head>
+
 <header class="container-fluid">
   <nav>
     <ul>
