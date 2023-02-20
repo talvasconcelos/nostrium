@@ -1,15 +1,11 @@
-import Index from "./lib/Index.svelte";
-import Post from "./lib/Post.svelte";
+import Index from "./Index.svelte";
+import Author from "./Author.svelte";
+import Post from "./Post.svelte";
 const routes = {
   // Exact path
   "/": Index,
-
-  // Using named parameters, with last being optional
-  "/post/:slug": Post
-
-  // Catch-all
-  // This is optional, but if present it must be the last
-  //'*': NotFound,
+  "/:author": Author,
+  "/:author/:id": Post
 };
 
 export { routes };
