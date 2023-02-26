@@ -4,7 +4,7 @@ import Post from "./Post.svelte";
 const routes = {
   // Exact path
   "/": Index,
-  "/:author": Author,
+  "/:code": PostOrAuthor,
   "/:author/:id": Post
 };
 

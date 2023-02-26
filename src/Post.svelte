@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { link } from "svelte-spa-router";
-  import { state, init } from "./store";
+  import { state, initAuthor } from "./store";
   import Avatar from "./components/Avatar.svelte";
   import Markdown from "./components/Markdown.svelte";
 
@@ -10,7 +10,7 @@
   let post = $state.posts.find((p) => p.d === params.id);
 
   onMount(() => {
-    if (!post) init(params)
+    if (!post) initAuthor(params)
   })
 
   $: profile = $state.profiles?.get(post?.pubkey)

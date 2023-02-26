@@ -1,11 +1,11 @@
 <script>
   import { onMount } from "svelte";
-  import { state, init } from "./store";
+  import { state, initAuthor } from "./store";
   import PostCard from "./components/PostCard.svelte";
 
   export let params;
   onMount(() => {
-    init(params)
+    initAuthor(params)
   })
 </script>
 

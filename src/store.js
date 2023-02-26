@@ -25,11 +25,11 @@ const defaultRelays = [
 const pool = new SimplePool()
 let relays = defaultRelays;
 
-export async function init(params) {
-  let pubkey = params.author;
+export async function initAuthor(params) {
+  let {author: pubkey, relays} = params;
 
   // detemine relays to use for pubkey
-  let givenRelays = [];
+  let givenRelays = relays || [];
   try {
     let { type, data } = nip19.decode(pubkey)
     if (type === 'npub') pubkey = data
