@@ -9,7 +9,10 @@ export const state = writable({
 });
 
 const defaultRelays = [
-  "wss://nostr-relay.untethr.me",
+  "wss://relay.damus.io",
+  "wss://relay.snort.social",
+  "wss://nos.lol",
+  "wss://nostr.wine",
   "wss://relay.nostr.bg",
   "wss://nostr-pub.wellorder.net",
   "wss://nostr-pub.semisol.dev",
