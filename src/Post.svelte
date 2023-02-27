@@ -1,20 +1,19 @@
 <script>
   import { onMount } from "svelte";
   import { link } from "svelte-spa-router";
-  import { state, initAuthor } from "./store";
   import Avatar from "./components/Avatar.svelte";
   import Markdown from "./components/Markdown.svelte";
+  import { initAuthor, state } from "./store";
 
   export let params;
 
-  let post = $state.posts.find((p) => p.d === params.id);
-
   onMount(() => {
-    if (!post) initAuthor(params)
-  })
+    if (!post) initAuthor(params);
+  });
 
-  $: profile = $state.profiles?.get(post?.pubkey)
-  $: pubkey = post?.pubkey
+  $: profile = $state.profiles?.get(post?.pubkey);
+  $: pubkey = post?.pubkey;
+  $: post = $state.posts.find((p) => p.d === params.id);
 </script>
 
 <div aria-busy={$state.loading}>
@@ -35,7 +34,12 @@
     <Markdown>{post?.content}</Markdown>
   {:else if !$state.loading}
     <p>Article "{params.id}" not found.</p>
-    <p>Go back to <a href={`/${params.author}`} use:link>{params.author}</a>.</p>
+    <p>
+      Go back to <a
+        href={`/${params.author}`}
+        use:link>{params.author}</a
+      >.
+    </p>
   {/if}
   <section>
     <footer>
