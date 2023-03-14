@@ -1,148 +1,152 @@
-import { nip19, SimplePool } from "nostr-tools";
-import { writable } from "svelte/store";
+import {SimplePool} from 'nostr-tools'
+import {writable} from 'svelte/store'
 
 export const state = writable({
-  posts: [],
+  authors: new Set(),
+  posts: new Map(),
   profiles: new Map(),
   relaysForProfile: new Map(),
   loading: true
-});
+})
 
 const defaultRelays = [
-  "wss://relay.damus.io",
-  "wss://relay.snort.social",
-  "wss://nos.lol",
-  "wss://nostr.wine",
-  "wss://relay.nostr.bg",
-  "wss://nostr-pub.wellorder.net",
-  "wss://nostr-pub.semisol.dev",
-  "wss://eden.nostr.land",
-  "wss://nostr.mom",
-  "wss://nostr.fmt.wiz.biz",
-  "wss://nostr.zebedee.cloud"
-];
+  'wss://relay.damus.io',
+  'wss://relay.snort.social',
+  'wss://nos.lol',
+  'wss://nostr.wine',
+  'wss://relay.nostr.bg',
+  'wss://nostr-pub.wellorder.net',
+  'wss://nostr-pub.semisol.dev',
+  'wss://eden.nostr.land',
+  'wss://nostr.mom',
+  'wss://nostr.fmt.wiz.biz',
+  'wss://nostr.zebedee.cloud'
+]
 
-const pool = new SimplePool();
-let relays = defaultRelays;
+const pool = new SimplePool({
+  getTimeout: 100000
+})
+let relays = defaultRelays
 
-export async function initAuthor(params) {
-  let { author: pubkey, relays } = params;
+export async function init({author: pubkey, relays, d}) {
+  state.update(s => ({...s, loading: true}))
 
   // detemine relays to use for pubkey
-  let givenRelays = relays || [];
-
-  try {
-    let { type, data } = nip19.decode(pubkey);
-    if (type === "npub") pubkey = data;
-    else if (type === "nprofile") {
-      pubkey = data.pubkey;
-      givenRelays = data.relays;
-    }
-  } catch (err) {
-    /**/
-  }
+  let givenRelays = relays || []
 
   if (givenRelays.length < 4) {
     givenRelays = [
       ...givenRelays,
-      ...(await searchDefaultRelaysForKind10002(pubkey))
-    ];
+      ...defaultRelays
+      //...(await searchDefaultRelaysForKind10002(pubkey)) // sometimes this takes too long
+    ]
   }
 
   if (givenRelays.length >= 4) {
-    relays = givenRelays;
+    relays = givenRelays
   }
 
   // connect to all relays
-  console.log(relays);
+  console.log(relays)
 
-  let awaitables = [];
+  let awaitables = []
 
   // fetch metadata
   let r1 = await pool
-    .get(relays, { authors: [pubkey], kinds: [0] })
-    .then((event) => {
-      if (!event) return;
+    .get(relays, {authors: [pubkey], kinds: [0]})
+    .then(event => {
+      if (!event) return
 
       try {
-        state.update((s) => {
-          s.profiles.set(event.pubkey, JSON.parse(event.content));
-          return s;
-        });
+        state.update(s => {
+          s.profiles.set(event.pubkey, JSON.parse(event.content))
+          if (!s.authors.has(event.pubkey)) {
+            s.authors.add(event.pubkey)
+          }
+          return s
+        })
       } catch (err) {
-        /**/
+        console.debug(err)
       }
-    });
-  awaitables.push(r1);
+      console.log('R1')
+      return
+    })
+    .catch(err => console.debug(err))
+  awaitables.push(r1)
 
   // fetch all posts regardless
   let r2 = pool
-    .list(relays, [{ authors: [pubkey], kinds: [30023], limit: 15 }])
-    .then((events) => {
-      state.update((s) => {
-        s.posts = events.map(eventToPost);
-        if (!params.id || s.posts.find((post) => post.id === params.id))
-          s.loading = false;
-        return s;
-      });
-    });
-  awaitables.push(r2);
+    .list(relays, [{authors: [pubkey], kinds: [30023], limit: 15}])
+    .then(events => {
+      if (!events || events.length == 0) return
+      state.update(s => {
+        events.map(ev => {
+          let post = eventToPost(ev)
+          s.posts.set(post.d, post)
+        })
+        s.loading = false
+        return s
+      })
+      console.log('R2')
+      return
+    })
+    .catch(err => console.debug(err))
+  awaitables.push(r2)
 
-  if (params.id) {
-    console.log(pubkey);
+  if (d) {
     // fetch specific post
     let r3 = await pool
       .get(relays, {
         kinds: [30023],
         limit: 1,
         authors: [pubkey],
-        "#d": [params.id]
+        '#d': [d]
       })
-      .then((event) => {
-        state.update((s) => {
+      .then(event => {
+        if (!event) return
+        state.update(s => {
           if (event) {
-            let post = eventToPost(event);
-            console.log(post);
-            if (!s.posts.find((spost) => spost.d === post.d))
-              s.posts.push(post);
+            let post = eventToPost(event)
+            if (post.d && !s.posts.has(post.d)) {
+              s.posts.set(post.d, post)
+            }
           }
-          s.loading = false;
-          return s;
-        });
-      });
-    awaitables.push(r3);
+          s.loading = false
+          return s
+        })
+        console.log('R3')
+        return
+      })
+      .catch(err => console.debug(err))
+    awaitables.push(r3)
   }
+  await Promise.all(awaitables)
 
-  await Promise.all(awaitables);
-
-  pool.close(relays);
+  pool.close(relays)
 }
 
 export function getRelaysForEvent(id) {
-  return pool.seenOn(id);
+  return pool.seenOn(id)
 }
 
 function eventToPost(event) {
-  return { ...event, ...Object.fromEntries(event.tags) };
+  return {...event, ...Object.fromEntries(event.tags)}
 }
 
 async function searchDefaultRelaysForKind10002(pubkey) {
   let relaysList = await pool.get(defaultRelays, {
     kinds: [10002],
     authors: [pubkey]
-  });
-  if (!relaysList) return [];
+  })
+  if (!relaysList) return defaultRelays
 
-  let relays = [];
+  let relays = []
 
   relaysList.tags.forEach(([t, v]) => {
-    if (t === "r" && v) {
-      relays.push(v);
+    if (t === 'r' && v) {
+      relays.push(v)
     }
-  });
+  })
 
-  // This is causing the pool to close before fetching posts
-  //pool.close(defaultRelays);
-
-  return relays;
+  return relays
 }
