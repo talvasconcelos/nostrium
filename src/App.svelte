@@ -1,6 +1,6 @@
 <script>
-  import Router, { link } from "svelte-spa-router";
-  import { routes } from "./routes";
+  import Router, {link} from 'svelte-spa-router'
+  import {routes} from './routes'
 </script>
 
 <header class="container-fluid">

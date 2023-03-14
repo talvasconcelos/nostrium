@@ -1,12 +1,9 @@
 <script>
-  export let picture;
+  export let picture
 </script>
 
 <figure style={`background-image: url(${picture})`}>
-  <img
-    src={picture}
-    alt="avatar"
-  />
+  <img src={picture} alt="avatar" />
 </figure>
 
 <style>
