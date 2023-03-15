@@ -15,9 +15,9 @@
   $: relays = data.relays || []
 
   onMount(async () => {
-    //if (!post) {
-    await init({author: pubkey, relays, d})
-    //}
+    if (!post) {
+      await init({author: pubkey, relays, d})
+    }
   })
 
   $: post = $state.posts.get(d)
