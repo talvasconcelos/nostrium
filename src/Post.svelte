@@ -15,9 +15,9 @@
   $: relays = data.relays || []
 
   onMount(async () => {
-    //if (!post) {
-    await init({author: pubkey, relays, d})
-    //}
+    if (!post) {
+      await init({author: pubkey, relays, d})
+    }
   })
 
   $: post = $state.posts.get(d)
@@ -31,6 +31,30 @@
     : null
 </script>
 
+<svelte:head>
+  {#if post}
+    <title>{post.title}</title>
+    <!-- Open Graph -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={post.title} />
+    {#if post.summary}
+      <meta name="twitter:description" content={post.summary} />
+      <meta property="og:description" content={post.summary} />
+    {:else}
+      <meta name="twitter:description" content="Nostrium" />
+      <meta property="og:description" content="Nostrium" />
+    {/if}
+    {#if post.image}
+      <meta name="twitter:image" content={post.image} />
+      <meta property="og:image" content={post.image} />
+    {/if}
+    <meta property="twitter:url" content="https://read.nostr.com" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://read.nostr.com" />
+    <meta property="og:title" content={post.title} />
+  {/if}
+</svelte:head>
 <div aria-busy={$state.loading}>
   {#if post}
     <header>

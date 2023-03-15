@@ -14,6 +14,32 @@
   }
 </script>
 
+<svelte:head>
+  <title>Nostrium</title>
+  <meta
+    name="Keywords"
+    content="medium, markdown, nostr, tool, nip23, blog, long format, post"
+  />
+  <!-- Open Graph -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Nostrium" />
+  <meta
+    name="twitter:description"
+    content="Unfiltered Content for Independent Thinkers"
+  />
+  <meta name="twitter:image" content="https://read.nostr.com/nostrium.png" />
+  <meta property="twitter:url" content="https://read.nostr.com" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://read.nostr.com" />
+  <meta property="og:title" content="Nostrium" />
+  <meta
+    property="og:description"
+    content="Unfiltered Content for Independent Thinkers"
+  />
+  <meta property="og:image" content="https://read.nostr.com/nostrium.png" />
+</svelte:head>
+
 <div class="hero">
   <hgroup>
     <h1>Nostrium</h1>
