@@ -37,8 +37,7 @@ export async function init({author: pubkey, relays, d}) {
   if (givenRelays.length < 4) {
     givenRelays = [
       ...givenRelays,
-      ...defaultRelays
-      //...(await searchDefaultRelaysForKind10002(pubkey)) // sometimes this takes too long
+      ...(await searchDefaultRelaysForKind10002(pubkey))
     ]
   }
 
@@ -67,15 +66,19 @@ export async function init({author: pubkey, relays, d}) {
         })
       } catch (err) {
         console.debug(err)
+        return
       }
       console.log('R1')
       return
     })
-    .catch(err => console.debug(err))
+    .catch(err => {
+      console.debug(err)
+      return
+    })
   awaitables.push(r1)
 
   // fetch all posts regardless
-  let r2 = pool
+  let r2 = await pool
     .list(relays, [{authors: [pubkey], kinds: [30023], limit: 15}])
     .then(events => {
       if (!events || events.length == 0) return
@@ -90,7 +93,10 @@ export async function init({author: pubkey, relays, d}) {
       console.log('R2')
       return
     })
-    .catch(err => console.debug(err))
+    .catch(err => {
+      console.debug(err)
+      return
+    })
   awaitables.push(r2)
 
   if (d) {
@@ -117,12 +123,15 @@ export async function init({author: pubkey, relays, d}) {
         console.log('R3')
         return
       })
-      .catch(err => console.debug(err))
+      .catch(err => {
+        console.debug(err)
+        return
+      })
     awaitables.push(r3)
   }
   await Promise.all(awaitables)
 
-  pool.close(relays)
+  return pool.close(relays)
 }
 
 export function getRelaysForEvent(id) {
